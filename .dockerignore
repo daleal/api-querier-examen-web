@@ -1,0 +1,17 @@
+# Ignore everything
+*
+
+# Include application files
+!src
+!.nvmrc
+!.sequelizerc
+!babel.config.js
+!index.js
+!nodemon.js
+!docs/openapi.json
+
+# Include build files
+!entrypoint.sh
+!package.json
+!webpack.config.js
+!yarn.lock

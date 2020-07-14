@@ -1,0 +1,413 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "API Examen",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://battleship.iic2513.phobos.cl",
+      "description": "Servidor de la API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Autenticación",
+      "description": "Endpoints para autenticar"
+    },
+    {
+      "name": "Juego",
+      "description": "Endpoints para interactuar con el juego"
+    }
+  ],
+  "paths": {
+    "/auth": {
+      "put": {
+        "summary": "Obtener el JSON Web Token",
+        "description": "Endpoint que recibe en el body un objeto en formato JSON con los parametros email y studentNumber (tu correo UC y numero de alumno) y retorna un JWT. Este token le permitira acceder a todos los siguientes endpoints. Puedes solicitarlo solo una vez, ya que no deberia caducar.",
+        "tags": ["Autenticación"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "studentNumber": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/AuthenticationError"
+          }
+        }
+      }
+    },
+    "/games": {
+      "post": {
+        "summary": "Crear juego",
+        "description": "Endpoint que crea un nuevo juego en el servidor y retorna el id del nuevo juego.",
+        "tags": ["Juego"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "gameId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JSONWebTokenAuth": []
+          }
+        ]
+      }
+    },
+    "/games/{id}/action": {
+      "post": {
+        "summary": "Ejecutar acción y obtener acción del oponente",
+        "description": "Endpoint que recibe la acción realizada por el usuario y retorna la acción realizada por el computador.",
+        "tags": ["Juego"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Id of the chat to retrieve."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  { "$ref": "#/components/schemas/MoveAction" },
+                  { "$ref": "#/components/schemas/FireAction" }
+                ]
+              },
+              "examples": {
+                "Move Action": {
+                  "value": {
+                    "action": {
+                      "type": "MOVE",
+                      "ship": "C1",
+                      "direction": "SOUTH",
+                      "quantity": 1
+                    }
+                  }
+                },
+                "Fire Action": {
+                  "value": {
+                    "action": {
+                      "type": "FIRE",
+                      "ship": "D2",
+                      "row": 5,
+                      "column": 8
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    { "$ref": "#/components/schemas/MoveAction" },
+                    { "$ref": "#/components/schemas/FireAction" }
+                  ]
+                },
+                "examples": {
+                  "Move Action": {
+                    "value": {
+                      "action": {
+                        "type": "MOVE",
+                        "ship": "C1",
+                        "direction": "SOUTH",
+                        "quantity": 1
+                      },
+                      "events": []
+                    }
+                  },
+                  "Fire Action": {
+                    "value": {
+                      "action": {
+                        "type": "FIRE",
+                        "ship": "D2",
+                        "row": 5,
+                        "column": 8
+                      },
+                      "events": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidAction"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/GameNotFound"
+          }
+        },
+        "security": [
+          {
+            "JSONWebTokenAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "JSONWebTokenAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "responses": {
+      "AuthenticationError": {
+        "description": "AuthenticationError",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "enum": [
+                    "Invalid credentials"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Unauthorized"
+      },
+      "InvalidAction": {
+        "description": "Error: Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "enum": [
+                    "An action must be defined"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "GameNotFound": {
+        "description": "Error: Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "enum": [
+                    "Game not found"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "MoveAction": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["MOVE"]
+              },
+              "ship": {
+                "type": "string"
+              },
+              "direction": {
+                "type": "string",
+                "enum": ["NORTH", "SOUTH", "EAST", "WEST"]
+              },
+              "quantity": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["HIT_SHIP"]
+                    },
+                    "ship": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["DESTROYED_SHIP"]
+                    },
+                    "ship": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["DESTROYED_ALL_SHIPS"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": ["action"]
+      },
+      "FireAction": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["FIRE"]
+              },
+              "ship": {
+                "type": "string"
+              },
+              "row": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9
+              },
+              "column": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9
+              }
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["HIT_SHIP"]
+                    },
+                    "ship": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["DESTROYED_SHIP"]
+                    },
+                    "ship": {
+                      "type": "string"
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["DESTROYED_ALL_SHIPS"]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "required": ["action"]
+      }
+    }
+  }
+}
