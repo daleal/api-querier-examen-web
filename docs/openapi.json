@@ -41,6 +41,14 @@
                   }
                 },
                 "additionalProperties": false
+              },
+              "examples": {
+                "example": {
+                  "value": {
+                    "email": "gpvidal@uc.cl",
+                    "studentNumber": "12345J"
+                  }
+                }
               }
             }
           }
@@ -55,6 +63,13 @@
                   "properties": {
                     "token": {
                       "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmFjayI6dHJ1ZSwibmFtZSI6IkRhbmllbCBMZWFsIn0.gFdVPm5yfVv8Ln41JVB15aeEa1FGsVWkXFZ8rEEcrCg"
                     }
                   }
                 }
@@ -82,6 +97,13 @@
                   "properties": {
                     "gameId": {
                       "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "example": {
+                    "value": {
+                      "gameId": "764d8a6c-9d3f-47db-a5a0-c20949a29c50"
                     }
                   }
                 }
