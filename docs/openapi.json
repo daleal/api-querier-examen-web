@@ -340,7 +340,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": ["DESTROYED_SHIP"]
+                      "enum": ["SHIP_DESTROYED"]
                     },
                     "ship": {
                       "type": "string"
@@ -352,7 +352,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": ["DESTROYED_ALL_SHIPS"]
+                      "enum": ["ALL_SHIPS_DESTROYED"]
                     }
                   }
                 }
@@ -408,7 +408,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": ["DESTROYED_SHIP"]
+                      "enum": ["SHIP_DESTROYED"]
                     },
                     "ship": {
                       "type": "string"
@@ -420,7 +420,7 @@
                   "properties": {
                     "type": {
                       "type": "string",
-                      "enum": ["DESTROYED_ALL_SHIPS"]
+                      "enum": ["ALL_SHIPS_DESTROYED"]
                     }
                   }
                 }
